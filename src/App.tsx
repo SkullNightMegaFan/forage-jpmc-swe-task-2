@@ -49,7 +49,25 @@ class App extends Component<{}, IState> {
    */
   getDataFromServer() {
     //creating interval variable
-   
+    /*
+
+    originally I was trying to do something similar to
+    let continousInterval;
+        if(!continousInterval)
+        {
+          continousInterval = setInterval(this.getDataFromServer, 500)
+        }
+          This doesn't work because in order to use that syntax the first "arguement"(the first thing you can put inside)
+          has to be a function. We are working with methods that are attached to an object. 
+          So instead we have to use the syntax:
+          setInterval(code, delay)
+          In the model example which I followed, we set a variable to 0 so to act as a timer. Which when it reaches a full second clears the interval. Which after a tenth of a second we then repeat the interval again. 
+          I'm surprised we have to use x for a counter but alas, I'm still figuring this programming stuff out. 
+          We use a pointer to put all the code inside getDataFromServer to serve as the code and then after putting in the x to clear the interval
+          we then add the final delay.
+    */
+    let x=0;
+   const continousInterval = setInterval(()=>{
     DataStreamer.getData((serverResponds: ServerRespond[]) => {
       // Update the state by creating a new array of data that consists of
       // Previous data in the state and the new data from server
@@ -57,21 +75,23 @@ class App extends Component<{}, IState> {
       //We know that we have a working function already with get datafrom server
       //All we need to do is have this function repeat on a predetermined interval
       //Let's set the interval to every 10 milliseconds
-      this.setState({ data: [...this.state.data, ...serverResponds] });
-      
-      let ContinousInterval;
-if (!ContinousInterval)
-{
-  ContinousInterval = setInterval(this.getDataFromServer, 500);
-}
-
-      
-
-
+      this.setState({ data:serverResponds,
+                      showGraph: true});
     
     });
+    x++;
+    if (x>1000) {
+      clearInterval(continousInterval);
+    }
+   }, 100);
+   
+   
   }
+/*
 
+
+Our data now streams continously, the problem now is that we need to aggregate the duplicated data and have a graph appear to visualize the data. 
+*/
   /**
    * Render the App react component
    */

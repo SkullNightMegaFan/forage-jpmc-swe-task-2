@@ -14,7 +14,8 @@ interface IProps {
  * Perspective library adds load to HTMLElement prototype.
  * This interface acts as a wrapper for Typescript compiler.
  */
-interface PerspectiveViewerElement {
+//adding functionality for the element to work with html
+interface PerspectiveViewerElement extends HTMLElement {
   load: (table: Table) => void,
 }
 
@@ -32,13 +33,14 @@ class Graph extends Component<IProps, {}> {
 
   componentDidMount() {
     // Get element to attach the table from the DOM.
-    const elem: PerspectiveViewerElement = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
 
     const schema = {
       stock: 'string',
       top_ask_price: 'float',
       top_bid_price: 'float',
       timestamp: 'date',
+
     };
 
     if (window.perspective && window.perspective.worker()) {
@@ -46,9 +48,16 @@ class Graph extends Component<IProps, {}> {
     }
     if (this.table) {
       // Load the `table` in the `<perspective-viewer>` DOM reference.
-
-      // Add more Perspective configurations here.
       elem.load(this.table);
+      // Add more Perspective configurations here.
+     //Add elements and give them attributes. Took the data from schema
+     //I also made the graph larger for no reason other than that I could.  ¯\_(ツ)_/¯
+      elem.setAttribute('view', 'y_line');
+      elem.setAttribute('column-pivots', '["stock"]');
+      elem.setAttribute('row-pivots', '["timestamp"]');
+      elem.setAttribute('columns', '["top_ask_price"]');
+      elem.setAttribute('aggregates', '{"stock":"distinct count", "top_ask_price": "avg","top_bid_price": "avg", "timestamp": "distinct count"}'
+     );
     }
   }
 
